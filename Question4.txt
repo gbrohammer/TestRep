@@ -1,0 +1,23 @@
+My idea was to allow using the data on dashboards with configurable graphs as well as other software like PowerBI.
+
+    I don't know all the kinds of data stored for customers but due to the dynamic nature of these third-party data, I would make it generic so I called this 'Entity'.
+    I mapped the FarmId to TenantId (this will probably be a independent TenantId in a real system from the Auth token/user context mechanisms.)
+    TenantId should be filtered on Repository level for all queries (not in paths).
+    Instead of re-inventing the wheel, a lot of time could be saved by just using OData.
+    I created an "odata" prefix for all OData controllers to not conflict with API controllers since they are different.
+    I would version the API if it consumed by external services or services not in the same repository.
+    If only consumed within a monorepo, I would not add versioning as the consumers of an API could be updated with the back-end and deployed together.  This saves a lot of development time.
+    For the front-end client I would consume this library: https://www.npmjs.com/package/@odata/client to generate the OData queries.
+    The front-end would query the schema of the entities it would like to consume.
+    With versioning the odata endpoint would be prefixed in the path such as "odata/v1/$metadata
+    Then based on metadata available and path to in this case our Entity:
+        Group by date and avg the yield as averageYield
+        http://localhost:5072/odata/v1/Entities?%24apply=groupby%28%28date%29%2Caggregate%28yieldData_yield%20with%20average%20as%20averageYield%29%29
+
+        Limit 10 entries and skip 10 entries. (Good for paging)
+        http://localhost:5072/odata/v1/Entities?%24top=10&%24skip=10
+
+        Filter for cowId
+        http://localhost:5072/odata/v1/Entities?%24filter=cowId%20eq%20%2764523d73443c980333bc8061%27
+
+    On the front-end the schema could be parsed to list all available properties for all the entities.
